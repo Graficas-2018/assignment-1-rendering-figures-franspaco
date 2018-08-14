@@ -173,33 +173,13 @@ function draw(gl, obj)
 // TO DO: Create functions needed to generate the vertex data for the different figures.
 function createSquare(gl) 
 {
-    /*
     var square = [
         .5,  .5,  0.0,
         -.5,  .5,  0.0,
         .5, -.5,  0.0,
         -.5, -.5,  0.0
     ];
-    return MakeShape(gl, square);
-    */
-   var vertexBuffer;
-    vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    var verts = [
-        .5,  .5,  0.0,
-        -.5,  .5,  0.0,
-        .5, -.5,  0.0,
-        -.5, -.5,  0.0
-    ];
-    // void gl.bufferData(target, ArrayBufferView srcData, usage, srcOffset, length);
-    // target = gl.ARRAY_BUFFER: Buffer containing vertex attributes, such as vertex coordinates, texture coordinate data, or vertex color data.
-    // srcData = This is a new data type introduced into web browsers for use with WebGL. Float32Array is a type of ArrayBuffer, also known as a typed array. This is a JavaScript type that stores compact binary data. 
-    // usage = A GLenum specifying the usage pattern of the data store. gl.STATIC_DRAW: Contents of the buffer are likely to be used often and not change often. Contents are written to the buffer, but not read.
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
-
-    // The resulting object contains the vertexbuffer, the size of the vertex structure (3 floats, x, y, z), the number of vertices to be drawn, the the primitive to draw.
-    var square = {buffer:vertexBuffer, vertSize:3, nVerts:4, primtype:gl.TRIANGLE_STRIP};
-    return square;
+    return MakeShape(gl, square, gl.TRIANGLE_STRIP);
 }
 
 function createTriangle(gl)
@@ -209,22 +189,46 @@ function createTriangle(gl)
         .5, -.5,  0.0,
         -.5, -.5,  0.0
     ];
-    return triangle;
+    return MakeShape(gl, triangle, gl.TRIANGLES);
 }
 
 function createRhombus(gl)
 {
-    var rhombus = {};
-    return rhombus;
+    var rhombus = [
+        0.5, 0, 0,
+        0, 0.5, 0,
+        0, -0.5, 0,
+        -0.5, 0, 0
+        
+    ];
+    return MakeShape(gl, rhombus, gl.TRIANGLE_STRIP);
 }
 
 function createSphere(gl, radius)
 {
-    var sphere = {};
-    return sphere;
+    var size = 0.5;
+    var sphere = [
+        0, 0, 0
+    ];
+    for(var i = 45; i < 315; i+=2){
+        sphere.push(size * Math.cos(toRadians(i)));
+        sphere.push(size * Math.sin(toRadians(i)));
+        sphere.push(0);
+    }
+    return MakeShape(gl, sphere, gl.TRIANGLE_FAN);
 }
 
-function MakeShape(gl, verts){
+function toRadians (angle) {
+    return angle * (Math.PI / 180);
+  }
+
+/**
+ * Receives an array of vertices and returns a shape.
+ * @param {*} gl GL context
+ * @param {*} verts Array of vertices
+ * @param {*} primitive Primitive to use for the vertices
+ */
+function MakeShape(gl, verts, primitive){
     var vertexBuffer;
     vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -235,6 +239,6 @@ function MakeShape(gl, verts){
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
     // The resulting object contains the vertexbuffer, the size of the vertex structure (3 floats, x, y, z), the number of vertices to be drawn, the the primitive to draw.
     console.log(verts.length/3)
-    var shape = {buffer:vertexBuffer, vertSize:3, nVerts:verts.length/3, primtype:gl.TRIANGLES};
+    var shape = {buffer:vertexBuffer, vertSize:3, nVerts:verts.length/3, primtype:primitive};
     return shape;
 }
